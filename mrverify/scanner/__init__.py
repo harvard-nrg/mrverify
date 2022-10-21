@@ -19,7 +19,12 @@ class BaseScanner(object):
         for item in self._config:
             match = True
             for key,value in iter(item['scan'].items()):
-                strcmp = scan.get(key, '').casefold() == value.casefold()
+                val = scan.get(key, '')
+                # collapse consecutive backslash chars in image type
+                if key == 'image_type':
+                    value = re.sub(r'\\+', r'\\', value)
+                    val = re.sub(r'\\+', r'\\', val)
+                strcmp = val.casefold() == value.casefold()
                 match = match and strcmp
             if match:
                 self._params = item['params']
