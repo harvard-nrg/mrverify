@@ -31,7 +31,11 @@ class Report:
 
     def generate_html(self, saveto='report.html'):
         with open(saveto, 'w') as fo:
-            fo.write(self.template.render(data=self.data, meta=self.meta))
+            fo.write(self.template.render(
+                data=self.data,
+                meta=self.meta,
+                errors=self.has_errors
+            ))
 
 class Result(object):
     def __init__(self, name, actual, expected):

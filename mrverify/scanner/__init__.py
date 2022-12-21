@@ -76,7 +76,6 @@ class BaseScanner(object):
                 else:
                     assert actual == expected
             except AssertionError as e:
-                passed = False
                 logger.debug(f'{param} assertion error actual={actual} != expected={expected}')
                 self.result[param] = Err(param, actual, expected)
                 self.has_errors = True
