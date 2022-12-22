@@ -4,8 +4,9 @@ from mrverify.scanner.siemens import Siemens
 logger = logging.getLogger(__name__)
 
 class Skyra(Siemens):
-    def __init__(self, config):
-        super().__init__(config['Siemens']['Skyra'])
+    def __init__(self, conf):
+        skyra = conf.query('$.Siemens.Skyra')
+        super().__init__(skyra)
 
     @classmethod
     def check_model(cls, model):

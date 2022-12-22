@@ -7,6 +7,9 @@ name = "pypi"
 pyaml = "*"
 yaxil = "*"
 jinja2 = "*"
+jsonpath-ng = "*"
+google-api-python-client = "*"
+google-auth-oauthlib = "*"
 mrverify = {editable = true, path = "."}
 
 [dev-packages]

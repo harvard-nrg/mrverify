@@ -4,8 +4,9 @@ from mrverify.scanner.siemens import Siemens
 logger = logging.getLogger(__name__)
 
 class Prisma(Siemens):
-    def __init__(self, config):
-        super().__init__(config['Siemens']['Prisma'])
+    def __init__(self, conf):
+        prisma = conf.query('$.Siemens.Prisma')
+        super().__init__(prisma)
             
     @classmethod
     def check_model(cls, model):

@@ -9,9 +9,9 @@ from email.mime.application import MIMEApplication
 logger = logging.getLogger(__name__)
 __dir__ = os.path.dirname(__file__)
 
-class Mailer:
-    def __init__(self, config):
-        self._config = config['Notifications']['Email']
+class Notifier:
+    def __init__(self, conf):
+        self._conf = conf
         self._meta = dict()
 
     def add_report(self, report):
@@ -26,10 +26,12 @@ class Mailer:
             template = string.Template(fo.read())
         session = self._meta['session']
         message = template.safe_substitute(message=f'{session} has errors. See attachment for details.')
+        sender = self._conf.query('$.Notifications.SMTP.sender')
+        recipients = self._conf.query('$.Notifications.SMTP.recipients')
         msg = MIMEMultipart()
-        msg['Subject'] = 'scan verification errors⚠️ '
-        msg['From'] = self._config['sender']
-        msg['To'] = ', '.join(self._config['recipients'])
+        msg['Subject'] = '⚠️  scan verification errors'
+        msg['From'] = sender
+        msg['To'] = ', '.join(recipients)
         body = MIMEText(message, 'html')
         msg.attach(body)
         if self._report:
@@ -41,12 +43,15 @@ class Mailer:
                 )
             part['Content-Disposition'] = f'attachment; filename="{basename}"'
             msg.attach(part)
-        server = self._config.get('server', 'localhost')
+        server = self._conf.query(
+            '$.Notifications.SMTP.server',
+            default='localhost'
+        )
         smtp = smtplib.SMTP(server)
         smtp.connect()
         smtp.sendmail(
-            self._config['sender'],
-            self._config['recipients'],
+            sender,
+            recipients,
             msg.as_string()
         )
         smtp.close()

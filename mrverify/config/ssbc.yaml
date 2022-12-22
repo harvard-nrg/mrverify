@@ -1,5 +1,9 @@
 Notifications:
-    Email:
+    Gmail:
+        sender: donotreply@example.com
+        recipients:
+            - donotreply@example.com
+    SMTP:
         server: localhost
         sender: donotreply@example.com
         recipients:
