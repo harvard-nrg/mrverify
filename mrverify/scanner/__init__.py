@@ -36,7 +36,7 @@ class BaseScanner(object):
         num_files = len(files)
         for f in files:
             fullfile = os.path.join(folder, f)
-            self.check_file(fullfile, num_files)    
+            self.check_file(fullfile, num_files)
 
     def get_dicoms(self, folder):
       files = list()
@@ -58,6 +58,10 @@ class BaseScanner(object):
           return
         ds.num_files = num_files
         for param,expected in iter(self._params.items()):
+            # skip checking this parameter if any previous file was not Ok
+            res = self.result.get(param, None)
+            if res and not isinstance(res, Ok):
+                continue
             # check if this is a regex
             regex = re.match('regex\((.*)\)', str(expected))
             if regex:

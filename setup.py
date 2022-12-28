@@ -6,7 +6,11 @@ here = os.path.abspath(os.path.dirname(__file__))
 requires = [
     'yaxil',
     'pyaml',
-    'jinja2'
+    'jinja2',
+    'natsort',
+    'jsonpath-ng',
+    'google-api-python-client',
+    'google-auth-oauthlib'
 ]
 
 test_requirements = [

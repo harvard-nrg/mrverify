@@ -3,6 +3,7 @@ import io
 import csv
 import json
 import logging
+from natsort import natsorted
 from collections import namedtuple
 from jinja2 import Template
 
@@ -30,6 +31,7 @@ class Report:
         self.meta = meta
 
     def generate_html(self, saveto='report.html'):
+        self.data = dict(natsorted(self.data.items()))
         with open(saveto, 'w') as fo:
             fo.write(self.template.render(
                 data=self.data,
