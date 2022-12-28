@@ -26,6 +26,7 @@ def main():
     parser.add_argument('-p', '--project')
     parser.add_argument('-n', '--notify', action='store_true')
     parser.add_argument('-a', '--xnat-alias')
+    parser.add_argument('-o', '--output-file')
     parser.add_argument('--xnat-host')
     parser.add_argument('--xnat-user')
     parser.add_argument('--xnat-pass')
@@ -86,6 +87,8 @@ def main():
     }
     report.add_meta(meta)
     saveas = f'{experiment.label}.html'
+    if args.output_file:
+        saveas = os.path.expanduser(args.output_file)
     logger.info(f'saving {saveas}')
     report.generate_html(saveto=saveas)
     if report.has_errors and args.notify:
