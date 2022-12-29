@@ -32,6 +32,9 @@ class Report:
 
     def generate_html(self, saveto='report.html'):
         self.data = dict(natsorted(self.data.items()))
+        dirname = os.path.dirname(saveto)
+        if dirname:
+            os.makedirs(dirname, exist_ok=True)
         with open(saveto, 'w') as fo:
             fo.write(self.template.render(
                 data=self.data,
