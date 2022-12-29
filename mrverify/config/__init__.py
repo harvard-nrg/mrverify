@@ -23,15 +23,15 @@ class Config:
     def query(self, expression, **kwargs):
         exp = parse(expression)
         matches = exp.find(self._content)
-        match len(matches):
-            case 0:
-                if 'default' in kwargs:
-                    return kwargs['default']
-                raise ConfigQueryError(f'no result returned from JSONPath {expression}')
-            case 1:
-                return matches[0].value
-            case _:
-                raise ConfigError(f'multiple results returned from JSONPath {expression}')
+        num_matches = len(matches)
+        if num_matches == 0:
+            if 'default' in kwargs:
+                return kwargs['default']
+            raise ConfigQueryError(f'no result returned from JSONPath {expression}')
+        elif num_matches == 1:
+            return matches[0].value
+        else:
+            raise ConfigError(f'multiple results returned from JSONPath {expression}')
 
     def get_cache_dir(self):
         cache_dir = self._default_cache_dir
