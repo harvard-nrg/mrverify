@@ -20,4 +20,4 @@ python -m pip install mrverify
 ```
 
 ## Configuration
-You can find an example configuration file [here](https://github.com/harvard-nrg/mrverify/blob/main/mrverify/configs/ssbc.yaml).
+You can find an example configuration file [here](https://github.com/harvard-nrg/mrverify/blob/main/mrverify/config/ssbc.yaml).
