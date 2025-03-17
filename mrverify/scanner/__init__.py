@@ -53,7 +53,7 @@ class BaseScanner(object):
     def check_file(self, f, num_files):
         logger.debug(f'checking file {os.path.basename(f)}')
         try:
-          ds = pydicom.read_file(f)
+          ds = pydicom.dcmread(f)
         except InvalidDicomError as e:
           return
         ds.num_files = num_files
