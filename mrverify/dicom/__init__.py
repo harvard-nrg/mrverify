@@ -8,7 +8,13 @@ from pydicom.filereader import read_preamble
 
 logger = logging.getLogger(__name__)
 
-class BaseScanner(object):
+def get_dicom_format(ds):
+    tag = (0x0008, 0x0016)
+    if tag in ds:
+        return ds[tag].value
+    return None
+
+class BaseImage:
     def __init__(self, config):
         self._config = config
         self._params = dict()
@@ -63,7 +69,7 @@ class BaseScanner(object):
             if res and not isinstance(res, Ok):
                 continue
             # check if this is a regex
-            regex = re.match('regex\((.*)\)', str(expected))
+            regex = re.match(r'regex\((.*)\)', str(expected))
             if regex:
               expected = regex.group(1).strip()
             getter = getattr(self, param)
@@ -87,8 +93,5 @@ class BaseScanner(object):
             self.result[param] = Ok(param, actual, expected)
 
 class MissingTagError(Exception):
-    def __init__(self, tag):
-        self.tag = tag
-        self.message = tag
-        self.tagstr = f'(0x{self.tag[0]:04x},0x{self.tag[1]:04x})'
+    pass
 

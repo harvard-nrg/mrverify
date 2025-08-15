@@ -1,24 +1,36 @@
 import os
+import sys
 import yaml
 import logging
+from pathlib import Path
 from urllib.parse import urlparse
 from jsonpath_ng import jsonpath, parse
 
 logger = logging.getLogger(__name__)
 
 class Config:
-    def __init__(self, filename, hostname, default_cache_dir='~/.cache/mrverify'):
+    def __init__(self, filename, cache_dir='~/.cache/mrverify'):
         self._filename = filename
-        self._hostname = hostname
-        self._default_cache_dir = default_cache_dir
+        self._cache_dir = cache_dir
         self._content = self.parse_file()
-        self.config_dir = os.path.dirname(filename)
-        self.cache_dir = self.get_cache_dir()
+
+    @staticmethod
+    def load(confd, scanner):
+        path = Path(
+            confd,
+            scanner.manufacturer,
+            scanner.model,
+            scanner.software,
+            scanner.coil,
+            'mrverify.yaml'
+        )
+        logger.info(f'loading {path}')
+        return Config(path)
 
     def parse_file(self):
-        logger.info(f'parsing {self._filename}')
         with open(self._filename) as fo:
-            return yaml.load(fo, Loader=yaml.FullLoader)
+            config = yaml.load(fo, Loader=yaml.FullLoader)
+        return config['mrverify']
 
     def query(self, expression, **kwargs):
         exp = parse(expression)

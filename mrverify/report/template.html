@@ -40,7 +40,7 @@
         <thead class="thead-dark">
         <tr>
           <th colspan="4">
-            {{ item['scan']['series_description'] }} / {{ item['scan']['id'] }}
+            {{ item['scan']['series_description'] }} / {{ item['scan']['series_number'] }}
           </th>
         </tr>
         </thead>
@@ -58,7 +58,7 @@
             <b>Result</b>
           </td>
         </tr>
-        {% for param,result in item['checker'].result.items() %}
+        {% for param,result in item['validator'].result.items() %}
         {% if result.__str__() == 'Ok' %}
         <tr class="table-success">
         {% elif result.__str__() == 'Err' %}

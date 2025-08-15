@@ -3,6 +3,7 @@ import io
 import csv
 import json
 import logging
+from pathlib import Path
 from natsort import natsorted
 from collections import namedtuple
 from jinja2 import Template
@@ -16,15 +17,15 @@ class Report:
         self.data = dict()
         self.meta = dict()
         self.has_errors = False
-        template = os.path.join(__dir__, "template.html")
+        template = Path(__dir__, 'template.html')
         with open(template) as fo:
             self.template = Template(fo.read())
 
-    def add(self, scan, checker):
-        self.has_errors = self.has_errors or checker.has_errors
-        self.data[scan['id']] = {
+    def add(self, scan, validator):
+        self.has_errors = self.has_errors or validator.has_errors
+        self.data[scan.series_number] = {
             'scan': scan,
-            'checker': checker
+            'validator': validator
         }
 
     def add_meta(self, meta):
@@ -32,9 +33,7 @@ class Report:
 
     def generate_html(self, saveto='report.html'):
         self.data = dict(natsorted(self.data.items()))
-        dirname = os.path.dirname(saveto)
-        if dirname:
-            os.makedirs(dirname, exist_ok=True)
+        saveto.parent.mkdir(parents=True, exist_ok=True)
         with open(saveto, 'w') as fo:
             fo.write(self.template.render(
                 data=self.data,

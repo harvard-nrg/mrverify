@@ -1,32 +1,29 @@
 #!/usr/bin/env python
 
-import os
 import sys
-import yaml
 import json
 import yaxil
-import shutil
 import logging
+import mrverify
+import requests_cache
 import argparse as ap
+from pathlib import Path
 from urllib.parse import urlparse
 from mrverify.config import Config
 from mrverify.report import Report
-from mrverify.scanner.siemens.skyra import Skyra
-from mrverify.scanner.siemens.prisma import Prisma
+from mrverify.validator import Validator
 from mrverify.notifications.gmail import Notifier
 
-logger = logging.getLogger(__name__)
-vcr_log = logging.getLogger('vcr')
-vcr_log.setLevel(logging.ERROR)
+logger = logging.getLogger('mrcheck')
 
 def main():
     parser = ap.ArgumentParser()
-    parser.add_argument('-c', '--config-file', required=True)
+    parser.add_argument('-c', '--configs-dir', type=Path, required=True)
     parser.add_argument('-l', '--label', required=True)
     parser.add_argument('-p', '--project')
     parser.add_argument('-n', '--notify', action='store_true')
     parser.add_argument('-a', '--xnat-alias')
-    parser.add_argument('-o', '--output-file')
+    parser.add_argument('-o', '--output-file', type=Path)
     parser.add_argument('--xnat-host')
     parser.add_argument('--xnat-user')
     parser.add_argument('--xnat-pass')
@@ -39,56 +36,54 @@ def main():
         level = logging.DEBUG
     logging.basicConfig(level=level)
 
+    requests_cache.install_cache('xnat')
+
     auth = yaxil.auth2(args.xnat_alias)
     hostname = urlparse(auth.url).netloc
     logger.info(f'xnat hostname is {hostname}')
-
-    conf = Config(args.config_file, hostname)
-    logger.info(f'cache directory is {conf.cache_dir}')
 
     report = Report()
     logger.info('querying for experiment from xnat')
     experiment = next(yaxil.experiments(auth, label=args.label, project=args.project))
     logger.info('querying for scans from xnat')
-    for scan in yaxil.scans(auth, experiment=experiment):
-        scan_id = scan['id']
-        scanner_model = scan['scanner_model']
-        series_description = scan['series_description']
-        if Prisma.check_model(scanner_model):
-          checker = Prisma(conf)
-        elif Skyra.check_model(scanner_model):
-          checker = Skyra(conf)
-        else:
-          logger.warning(f'no checker matched scan={scan_id}, model={scanner_model}')
-          continue
-        if not checker.needs_checking(scan):
-            continue
-        logger.info('checking scan %s (%s)', scan['id'], series_description)
-        project = scan['session_project']
-        session = scan['session_label']
-        subject = scan['subject_label']
-        accession_id = scan['session_id']
-        scan_id = scan['id']
-        basename = f'{project}_{session}_{scan_id}'
-        dicom_dir = os.path.join(conf.cache_dir, basename)
-        if not os.path.exists(dicom_dir):
-            logger.info(f'downloading scan data to {dicom_dir}')
-            yaxil.download(auth, session, [scan_id], out_dir=dicom_dir)
-        else:
-            logger.info(f'found cached copy {dicom_dir}')
-        checker.check_dir(dicom_dir)
-        if not args.keep_cache:
-            shutil.rmtree(dicom_dir)
-        report.add(scan, checker)
+
+    logger.info('getting scanner details')
+    scanner = mrverify.get_scanner_details(auth, experiment)
+    logger.info(f'scanner details: {scanner}')
+
+    # load configuration file for scanner
+    conf = Config.load(
+        args.configs_dir,
+        scanner
+    )
+
+    cache_dir = conf.query('$.Storage.cache_dir')
+    cache_dir = Path(cache_dir, hostname).expanduser()
+
+    logger.info(f'requesting complete scan listing for {experiment.label}')
+    scans = list(mrverify.scans(auth, experiment))
+
+    for verify in conf.query('$.Verification'):
+        required = verify.get('required', False)
+        filter = verify.get('filter')
+        params = verify.get('params')
+        logger.info(f'looking for a match on {filter}')
+        for scan in mrverify.match(filter, scans):
+            series = scan.series_number
+            logger.info(f'found matching scan {series}')
+            validator = Validator()
+            validator.validate(scan, params)
+            report.add(scan, validator)
+
     meta = {
-        'project': project,
-        'subject': subject,
-        'session': session
+        'project': experiment.project,
+        'subject': experiment.subject_label,
+        'session': experiment.label
     }
     report.add_meta(meta)
-    saveas = f'{experiment.label}.html'
+    saveas = Path(f'{experiment.label}.html')
     if args.output_file:
-        saveas = os.path.expanduser(args.output_file)
+        saveas = args.output_file.expanduser()
     logger.info(f'saving {saveas}')
     report.generate_html(saveto=saveas)
     if report.has_errors and args.notify:
