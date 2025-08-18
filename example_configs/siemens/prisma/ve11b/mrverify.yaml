@@ -1,0 +1,246 @@
+mrverify:
+    Notifications:
+        Gmail:
+            sender: help@example.org
+            recipients:
+                - damadian@example.org
+                - ogawa@example.org
+        SMTP:
+            server: localhost
+            sender: help@example.org
+            recipients:
+                - damadian@example.org
+                - ogawa@example.org
+    Verification:
+        - filter:
+            series_description: tfl_b1map_STAR
+            image_type: [ORIGINAL, PRIMARY, M, ND]
+          required: True
+          params:
+            abs_table_position: range(-1275, -1225)
+            patient_position: HFS
+            num_slices: 12
+            pixel_spacing: [4, 4]
+            base_resolution: [0, 64, 56, 0]
+            percent_phase_field_of_view: 87.5
+            slice_thickness: 8
+            echo_time: 1.83
+            repetition_time: 8000
+            coil_elements: HC1-7;NC1
+            flip_angle: 8
+            prescan_norm: Off
+            bandwidth: 490
+            pe_direction: ROW
+            orientation_string: regex(Sag>.*)
+        - filter:
+            series_description: RF_Sens_head
+          required: True
+          params:
+            abs_table_position: range(-1275, -1225)
+            patient_position: HFS
+            num_slices: 44
+            pixel_spacing: [4, 4]
+            base_resolution: [0, 64, 56, 0]
+            percent_phase_field_of_view: 87.5
+            slice_thickness: 4
+            echo_time: 2
+            repetition_time: 4.6
+            coil_elements: HC1-7;NC1
+            flip_angle: 6
+            prescan_norm: Off
+            bandwidth: 490
+            pe_direction: ROW
+            orientation_string: regex(Sag>.*)
+        - filter:
+            series_description: RF_Sens_body
+          required: True
+          params:
+            abs_table_position: range(-1275, -1225)
+            patient_position: HFS
+            num_slices: 44
+            pixel_spacing: [4, 4]
+            base_resolution: [0, 64, 56, 0]
+            percent_phase_field_of_view: 87.5
+            slice_thickness: 4
+            echo_time: 2
+            repetition_time: 4.6
+            coil_elements: BC
+            flip_angle: 6
+            prescan_norm: Off
+            bandwidth: 490
+            pe_direction: ROW
+            orientation_string: regex(Sag>.*)
+        - filter:
+            series_description: ABCD_T1w_MPR_vNav_setter
+            image_type: [ORIGINAL, PRIMARY, M, ND]
+          required: True
+          params:
+            abs_table_position: range(-1275, -1225)
+            patient_position: HFS
+            num_slices: 32
+            pixel_spacing: [8, 8]
+            base_resolution: [0, 32, 32, 0]
+            percent_phase_field_of_view: 100
+            slice_thickness: 8
+            echo_time: 4.8
+            repetition_time: 11
+            coil_elements: BC
+            flip_angle: 2
+            prescan_norm: Off
+            bandwidth: 4885
+            pe_direction: ROW
+            orientation_string: regex(Sag>.*)
+        - filter:
+            series_description: PBN_T1w_MPR_vNav
+            image_type: [ORIGINAL, PRIMARY, M, ND, NORM]
+          required: True
+          params:
+            abs_table_position: range(-1275, -1225)
+            patient_position: HFS
+            num_slices: 176
+            pixel_spacing: [1, 1]
+            base_resolution: [0, 256, 240, 0]
+            percent_phase_field_of_view: 93.75
+            slice_thickness: 1
+            echo_time: 2.88
+            repetition_time: 2500
+            coil_elements: HC1-7;NC1
+            flip_angle: 8
+            prescan_norm: On
+            bandwidth: 240
+            pe_direction: ROW
+            orientation_string: regex(Sag>.*)
+        - filter:
+            series_description: AMP_fMRI_DistortionMap_PA
+          required: True
+          params:
+            abs_table_position: range(-1275, -1225)
+            patient_position: HFS
+            num_slices: 60
+            pixel_spacing: [2.4, 2.4]
+            base_resolution: [90, 0, 0, 90]
+            percent_phase_field_of_view: 100
+            slice_thickness: 2.4
+            echo_time: 60
+            repetition_time: 6200
+            coil_elements: HC1-7;NC1
+            flip_angle: 90
+            prescan_norm: On
+            bandwidth: 2135
+            pe_direction: COL
+            orientation_string: regex(Tra>.*)
+        - filter:
+            series_description: AMP_fMRI_DistortionMap_AP
+          required: True
+          params:
+            abs_table_position: range(-1275, -1225)
+            patient_position: HFS
+            num_slices: 60
+            pixel_spacing: [2.4, 2.4]
+            base_resolution: [90, 0, 0, 90]
+            percent_phase_field_of_view: 100
+            slice_thickness: 2.4
+            echo_time: 60
+            repetition_time: 6200
+            coil_elements: HC1-7;NC1
+            flip_angle: 90
+            prescan_norm: On
+            bandwidth: 2135
+            pe_direction: COL
+            orientation_string: regex(Tra>.*)
+        - filter:
+            series_description: AMP_fMRI_REST_PA
+          required: True
+          params:
+            abs_table_position: range(-1275, -1225)
+            patient_position: HFS
+            num_slices: 60
+            num_volumes: 333
+            pixel_spacing: [2.4, 2.4]
+            base_resolution: [90, 0, 0, 90]
+            percent_phase_field_of_view: 100
+            slice_thickness: 2.4
+            echo_time: 35
+            repetition_time: 900
+            coil_elements: HC1-7;NC1
+            flip_angle: 52
+            prescan_norm: On
+            bandwidth: 2135
+            pe_direction: COL
+            orientation_string: regex(Tra>.*)
+        - filter:
+            series_description: ABCD_T2w_SPC_vNav_setter
+            image_type: [ORIGINAL, PRIMARY, M, ND]
+          required: True
+          params:
+            abs_table_position: range(-1275, -1225)
+            patient_position: HFS
+            num_slices: 32
+            pixel_spacing: [8, 8]
+            base_resolution: [0, 32, 32, 0]
+            percent_phase_field_of_view: 100
+            slice_thickness: 8
+            echo_time: 6.1
+            repetition_time: 13
+            coil_elements: BC
+            flip_angle: 2
+            prescan_norm: Off
+            bandwidth: 4885
+            pe_direction: ROW
+            orientation_string: regex(Sag>.*)
+        - filter: 
+            series_description: PBN_T2w_SPC_vNav
+            image_type: [ORIGINAL, PRIMARY, M, ND, NORM]
+          required: True
+          params:
+            abs_table_position: range(-1275, -1225)
+            patient_position: HFS
+            num_slices: 176
+            pixel_spacing: [1, 1]
+            base_resolution: [0, 256, 240, 0]
+            percent_phase_field_of_view: 93.75
+            slice_thickness: 1
+            echo_time: 565
+            repetition_time: 3200
+            coil_elements: HC1-7;NC1
+            prescan_norm: On
+            bandwidth: 240
+            pe_direction: ROW
+            orientation_string: regex(Sag>.*)
+        - filter:
+            series_description: AMP_dMRI_b0_AP
+          params:
+            abs_table_position: range(-1275, -1225)
+            patient_position: HFS
+            num_slices: 81
+            pixel_spacing: [1.80, 1.80]
+            base_resolution: [120, 0, 0, 120] 
+            percent_phase_field_of_view: 100
+            slice_thickness: 1.8
+            echo_time: 79.4
+            repetition_time: 3200
+            coil_elements: HC1-7;NC1
+            flip_angle: 78
+            prescan_norm: On
+            bandwidth: 1985
+            pe_direction: COL
+            orientation_string: regex(Tra>.*)
+        - filter:
+            series_description: AMP_dMRI_dir176_PA 
+          params:
+            abs_table_position: range(-1275, -1225)
+            patient_position: HFS
+            num_slices: 81
+            num_volumes: 177
+            pixel_spacing: [1.80, 1.80]
+            base_resolution: [120, 0, 0, 120]
+            percent_phase_field_of_view: 100
+            slice_thickness: 1.8
+            echo_time: 79.4
+            repetition_time: 3200
+            coil_elements: HC1-7;NC1
+            flip_angle: 78
+            prescan_norm: On
+            bandwidth: 1985
+            pe_direction: COL
+            orientation_string: regex(Tra>.*)
