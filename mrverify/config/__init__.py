@@ -16,16 +16,26 @@ class Config:
 
     @staticmethod
     def load(confd, scanner):
-        path = Path(
-            confd,
+        subdirs = Path(
             scanner.manufacturer,
             scanner.model,
             scanner.software,
-            scanner.coil,
-            'mrverify.yaml'
+            scanner.coil
         )
-        logger.info(f'loading {path}')
-        return Config(path)
+        levels = len(subdirs.parts)
+        path = Path(confd, subdirs)
+        for level in range(levels):
+            conf = Path(
+                path,
+                'mrverify.yaml'
+            )
+            logger.info(f'looking for {conf}')
+            if conf.exists():
+                logger.info(f'found {conf} (loading)')
+                return Config(conf)
+            path = path.parent
+
+        raise ConfigError(f'could not find configuration file for {subdirs}')
 
     def parse_file(self):
         with open(self._filename) as fo:
@@ -55,6 +65,9 @@ class Config:
         cache_dir = os.path.join(cache_dir, self._hostname)
         cache_dir = os.path.expanduser(cache_dir)
         return cache_dir
+
+class ConfigError(Exception):
+    pass
 
 class ConfigQueryError(Exception):
     pass

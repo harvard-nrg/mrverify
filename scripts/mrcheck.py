@@ -27,7 +27,7 @@ def main():
     parser.add_argument('--xnat-host')
     parser.add_argument('--xnat-user')
     parser.add_argument('--xnat-pass')
-    parser.add_argument('--keep-cache', action='store_true')
+    parser.add_argument('--cache', action='store_true')
     parser.add_argument('-v', '--verbose', action='store_true')
     args = parser.parse_args()
 
@@ -36,7 +36,10 @@ def main():
         level = logging.DEBUG
     logging.basicConfig(level=level)
 
-    requests_cache.install_cache('xnat')
+    if args.cache:
+        name = 'xnat'
+        logger.info(f'caching responses to {name}.sqlite')
+        requests_cache.install_cache(name)
 
     auth = yaxil.auth2(args.xnat_alias)
     hostname = urlparse(auth.url).netloc
@@ -56,9 +59,6 @@ def main():
         args.configs_dir,
         scanner
     )
-
-    cache_dir = conf.query('$.Storage.cache_dir')
-    cache_dir = Path(cache_dir, hostname).expanduser()
 
     logger.info(f'requesting complete scan listing for {experiment.label}')
     scans = list(mrverify.scans(auth, experiment))
@@ -88,7 +88,7 @@ def main():
     report.generate_html(saveto=saveas)
     if report.has_errors and args.notify:
         logger.info('report has errors, sending notification')
-        notifier = Notifier(conf)
+        notifier = Notifier(conf, args.configs_dir)
         notifier.add_meta(meta)
         notifier.add_report(saveas)
         notifier.send()

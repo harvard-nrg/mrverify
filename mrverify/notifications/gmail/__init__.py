@@ -2,6 +2,7 @@ import os
 import string
 import base64
 import logging
+from pathlib import Path
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
@@ -15,8 +16,9 @@ logger = logging.getLogger(__name__)
 __dir__ = os.path.dirname(__file__)
 
 class Notifier:
-    def __init__(self, conf):
+    def __init__(self, conf, configs_dir):
         self._conf = conf
+        self._configs_dir = configs_dir
         self._meta = dict()
         self._scopes = [
             'https://www.googleapis.com/auth/gmail.send'
@@ -29,7 +31,7 @@ class Notifier:
         self._meta = meta
 
     def message_body(self):
-        email_template = os.path.join(__dir__, 'template.html')
+        email_template = Path(__dir__, 'template.html')
         with open(email_template, 'r') as fo:
             template = string.Template(fo.read())
         session = self._meta['session']
@@ -39,12 +41,12 @@ class Notifier:
         return body
 
     def send(self):
-        creds_file = os.path.join(self._conf.config_dir, 'credentials.json')
-        token_file = os.path.join(self._conf.config_dir, 'token.json')
+        creds_file = Path(self._configs_dir, 'credentials.json')
+        token_file = Path(self._configs_dir, 'token.json')
         logger.debug(creds_file)
         logger.debug(token_file)
         creds = None
-        if os.path.exists(token_file):
+        if token_file.exists():
             creds = Credentials.from_authorized_user_file(token_file, self._scopes)
 
         # If there are no (valid) credentials available, let the user log in.

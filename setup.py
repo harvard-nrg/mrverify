@@ -8,6 +8,8 @@ requires = [
     'pyaml',
     'jinja2',
     'natsort',
+    'nibabel',
+    'requests-cache',
     'jsonpath-ng',
     'google-api-python-client',
     'google-auth-oauthlib'
