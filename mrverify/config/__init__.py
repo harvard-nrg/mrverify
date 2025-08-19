@@ -55,17 +55,6 @@ class Config:
         else:
             raise ConfigError(f'multiple results returned from JSONPath {expression}')
 
-    def get_cache_dir(self):
-        cache_dir = self._default_cache_dir
-        try:
-            cache_dir = self.query('$.Storage.cache_dir')
-        except ConfigQueryError as e:
-            logger.debug(e)
-            pass
-        cache_dir = os.path.join(cache_dir, self._hostname)
-        cache_dir = os.path.expanduser(cache_dir)
-        return cache_dir
-
 class ConfigError(Exception):
     pass
 

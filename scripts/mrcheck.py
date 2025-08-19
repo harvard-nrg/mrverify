@@ -67,8 +67,13 @@ def main():
         required = verify.get('required', False)
         filter = verify.get('filter')
         params = verify.get('params')
+        required = verify.get('required', False)
         logger.info(f'looking for a match on {filter}')
-        for scan in mrverify.match(filter, scans):
+        matches = list(mrverify.match(filter, scans))
+        if not matches and required:
+            report.missed(filter)
+            continue
+        for scan in matches:
             series = scan.series_number
             logger.info(f'found matching scan {series}')
             validator = Validator()

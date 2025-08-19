@@ -16,10 +16,15 @@ class Report:
     def __init__(self):
         self.data = dict()
         self.meta = dict()
+        self.missing = list()
         self.has_errors = False
         template = Path(__dir__, 'template.html')
         with open(template) as fo:
             self.template = Template(fo.read())
+
+    def missed(self, filter):
+        self.missing.append(filter)
+        self.has_errors = True
 
     def add(self, scan, validator):
         self.has_errors = self.has_errors or validator.has_errors
@@ -37,6 +42,7 @@ class Report:
         with open(saveto, 'w') as fo:
             fo.write(self.template.render(
                 data=self.data,
+                missing=self.missing,
                 meta=self.meta,
                 errors=self.has_errors
             ))

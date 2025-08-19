@@ -36,13 +36,42 @@
       </nav>
     </div>
     <table class="table table-striped table-hover">
+      {% for filter in missing %}
+        <thead class="thead-dark">
+          <tr>
+            <th colspan="4">MISSING SCAN</th>
+          </tr>
+        </thead>
+        <tr class="table-secondary">
+          <td>
+            <b>Filter</b>
+          </td>
+          <td>
+            <b>Expected</b>
+          </td>
+          <td>
+            <b>Match</b>
+          </td>
+          <td>
+            <b>Result</b>
+          </td>
+        </tr>
+        {% for key,value in filter.items() %}
+          <tr class="table-danger">
+            <td>{{ key }}</td>
+            <td>{{ value }}</td>
+            <td>False</td>
+            <td>Err</td>
+          </tr>
+        {% endfor %}
+      {% endfor %}
       {% for scan,item in data.items() %}
         <thead class="thead-dark">
-        <tr>
-          <th colspan="4">
-            {{ item['scan']['series_description'] }} / {{ item['scan']['series_number'] }}
-          </th>
-        </tr>
+          <tr>
+            <th colspan="4">
+              {{ item['scan']['series_description'] }} / {{ item['scan']['series_number'] }}
+            </th>
+          </tr>
         </thead>
         <tr class="table-secondary">
           <td>
