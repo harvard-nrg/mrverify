@@ -98,6 +98,7 @@ def main():
         recipients_pass = conf.query('$.Notifications.recipients.pass', default=None)
         recipients_fail = conf.query('$.Notifications.recipients.fail', default=None)
         if recipients_fail and report.has_errors:
+            logger.info('report has errors')
             notifier.send(recipients_fail, error=True)
         if recipients_pass and not report.has_errors:
             notifier.send(recipients_pass)

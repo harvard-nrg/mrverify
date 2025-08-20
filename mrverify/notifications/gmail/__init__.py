@@ -29,13 +29,19 @@ class Notifier:
     def add_meta(self, meta):
         self._meta = meta
 
-    def message_body(self):
+    def message_body(self, error=False):
         email_template = Path(__dir__, 'template.html')
         with open(email_template, 'r') as fo:
             template = string.Template(fo.read())
         session = self._meta['session']
+        heading = 'MR scan parameter check'
+        message = f'{session} passed. See attachment for details.'
+        if error:
+            heading = 'MR scan parameter check errors'
+            message = f'{session} has errors. See attachment for details.'
         body = template.safe_substitute(
-            message=f'{session} has errors. See attachment for details.'
+            heading=heading,
+            message=message
         )
         return body
 
@@ -67,7 +73,8 @@ class Notifier:
             message = MIMEMultipart()
 
             # add message content
-            content = MIMEText(self.message_body(), 'html')
+            body = self.message_body(error=error)
+            content = MIMEText(body, 'html')
             message.attach(content)
 
             # set To, From, and Subject
