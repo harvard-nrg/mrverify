@@ -12,7 +12,7 @@ from urllib.parse import urlparse
 from mrverify.config import Config
 from mrverify.report import Report
 from mrverify.validator import Validator
-from mrverify.notifications.gmail import Notifier
+from mrverify.notifications import NotifierCreator
 
 logger = logging.getLogger('mrcheck')
 
@@ -91,12 +91,16 @@ def main():
         saveas = args.output_file.expanduser()
     logger.info(f'saving {saveas}')
     report.generate_html(saveto=saveas)
-    if report.has_errors and args.notify:
-        logger.info('report has errors, sending notification')
-        notifier = Notifier(conf, args.configs_dir)
+    if args.notify:
+        notifier = NotifierCreator.create(conf)
         notifier.add_meta(meta)
         notifier.add_report(saveas)
-        notifier.send()
+        recipients_pass = conf.query('$.Notifications.recipients.pass', default=None)
+        recipients_fail = conf.query('$.Notifications.recipients.fail', default=None)
+        if recipients_fail and report.has_errors:
+            notifier.send(recipients_fail, error=True)
+        if recipients_pass and not report.has_errors:
+            notifier.send(recipients_pass)
 
 if __name__ == '__main__':
     main()

@@ -16,9 +16,8 @@ logger = logging.getLogger(__name__)
 __dir__ = os.path.dirname(__file__)
 
 class Notifier:
-    def __init__(self, conf, configs_dir):
+    def __init__(self, conf):
         self._conf = conf
-        self._configs_dir = configs_dir
         self._meta = dict()
         self._scopes = [
             'https://www.googleapis.com/auth/gmail.send'
@@ -40,9 +39,11 @@ class Notifier:
         )
         return body
 
-    def send(self):
-        creds_file = Path(self._configs_dir, 'credentials.json')
-        token_file = Path(self._configs_dir, 'token.json')
+    def send(self, recipients, error=False):
+        creds_file = self._conf.query('$.Notifications.handler.credentials')
+        token_file = self._conf.query('$.Notifications.handler.token')
+        creds_file = Path(creds_file).expanduser()
+        token_file = Path(token_file).expanduser()
         logger.debug(creds_file)
         logger.debug(token_file)
         creds = None
@@ -70,13 +71,16 @@ class Notifier:
             message.attach(content)
 
             # set To, From, and Subject
-            sender = self._conf.query('$.Notifications.Gmail.sender')
-            recipients = self._conf.query('$.Notifications.Gmail.recipients')
+            sender = self._conf.query('$.Notifications.sender')
             logger.debug(sender)
             logger.info(f'sending report to {recipients}')
             message['To'] = ', '.join(recipients)
             message['From'] = sender
-            message['Subject'] = '⚠️  scan verification errors'
+            subject = '💡 scan verification report'
+            if error:
+                logger.info('resetting message')
+                subject = '⚠️  scan verification errors'
+            message['Subject'] = subject
 
             # add attachments
             if self._report:
