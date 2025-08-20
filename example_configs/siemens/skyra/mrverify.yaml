@@ -1,14 +1,14 @@
 mrverify:
     Notifications:
-        Gmail:
-            sender: help@example.org
-            recipients:
+        handler:
+            type: gmail
+            credentials: /path/to/credentials.json
+            token: /path/to/token.json
+        sender: help@example.org
+        recipients:
+            pass:
                 - damadian@example.org
-                - ogawa@example.org
-        SMTP:
-            server: localhost
-            sender: help@example.org
-            recipients:
+            fail:
                 - damadian@example.org
                 - ogawa@example.org
     Verification:
