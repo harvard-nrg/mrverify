@@ -146,13 +146,22 @@ class MRImageStorage:
 
     @property
     def secondary_image_type(self):
+        item = self._ds.PerFrameFunctionalGroupsSequence[0]
         try:
-            item = self._ds[(0x5200,0x9230)][0]
             item = item[(0x0021,0x11fe)][0]
             item = item[(0x0021,0x1175)]
+            return list(item.value)
         except KeyError:
-            return None
-        return list(item.value)
+            pass
+
+        try:
+            item = item[(0x0021,0x10fe)][0]
+            item = item[(0x0021,0x1075)]
+            return list(item.value)
+        except KeyError:
+            pass
+
+        return ['MISSING']
 
     @property
     def software_version(self):

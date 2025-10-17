@@ -1,4 +1,5 @@
 import sys
+import math
 import logging
 from pydicom.tag import Tag
 from mrverify.dicom import MissingTagError
@@ -97,12 +98,37 @@ class EnhancedMRImageStorage(MRImageStorage):
     @property
     def coil_elements(self):
         item = self._ds.PerFrameFunctionalGroupsSequence[0]
-        item = item[(0x0021, 0x11fe)][0]
-        return item[(0x0021, 0x114f)].value
+
+        try:
+            item = item[(0x0021, 0x11fe)][0]
+            return item[(0x0021, 0x114f)].value
+        except KeyError:
+            pass
+
+        try:
+            item = item[(0x0021, 0x10fe)][0]
+            return item[(0x0021, 0x104f)].value
+        except KeyError:
+            pass
+
+        return 'MISSING'
 
     @property
     def abs_table_position(self):
         item = self._ds.PerFrameFunctionalGroupsSequence[0]
-        item = item[(0x0021, 0x11fe)][0]
-        item = item[(0x0021, 0x1145)]
-        return list(item.value)[-1]
+
+        try:
+            item = item[(0x0021, 0x11fe)][0]
+            item = item[(0x0021, 0x1145)]
+            return list(item.value)[-1]
+        except KeyError:
+            pass
+
+        try:
+            item = item[(0x0021, 0x10fe)][0]
+            item = item[(0x0021, 0x1045)]
+            return list(item.value)[-1]
+        except KeyError:
+            pass
+
+        return math.inf
