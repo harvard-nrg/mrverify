@@ -47,7 +47,13 @@ def main():
 
     report = Report()
     logger.info('querying for experiment from xnat')
-    experiment = next(yaxil.experiments(auth, label=args.label, project=args.project))
+    experiment = next(
+        yaxil.experiments(
+            auth,
+            label=args.label,
+            project=args.project
+        )
+    )
     logger.info('querying for scans from xnat')
 
     logger.info('getting scanner details')

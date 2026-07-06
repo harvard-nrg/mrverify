@@ -31,8 +31,8 @@ mrcheck.py -a xnat -l AB1234C -c ./configs -o output.html
 
 MR Verify will query the XNAT installation `xnat` for the MR Session 
 with the label `AB1234C`. It will automatically detect acquisition 
-details such as the MRI scanner make, model, software version, and 
-receiver coil. 
+details such as the MRI scanner make, model, software version, 
+serial number, and receiver coil. 
 
 Once MR Verify has resolved scan acquisition details, it will look for a 
 parameter check configuration file for that specific type of environment
@@ -44,8 +44,8 @@ to `output.html`.
 # Configuration files
 
 MR Verify will attempt to load a configuration file based on scan acquisition 
-details including the MRI scanner make, model, software version, and receiver 
-coil. 
+details including the MRI scanner serial number, make, model, software version, 
+and receiver coil. 
 
 It will look for a configuration file within the directory the user passed in 
 via the `-c|--configs-dir` argument.
@@ -69,12 +69,13 @@ will begin by looking for a configuration file at the following location
                 └── mrverify.yaml
 ```
 
-If a configuration file could not be found at that location, MR Verify will 
-proceed by working its way back through the directory tree until it finds one.
+If a configuration file could not be found at that exact location, MR Verify
+will work its way back through the directory tree until it finds a match.
 
 For multisite studies, it is not unusual for a data collection site to only 
-have access to a 64-channel head coil which may require subtle changes to the 
-scanning protocol, leading to different MR Verify configuration files
+have access to a specific head coil. This may require subtle changes to the 
+scanning protocol, leading to different MR Verify configuration files for 
+sites using different head coils
 
 ```console
 ./configs
@@ -87,9 +88,9 @@ scanning protocol, leading to different MR Verify configuration files
                 └── mrverify.yaml
 ```
 
-On the other hand, perhaps the use of anything other than a 32-channel head 
-coil is a mistake. In that case, you may choose to specify a configuration file 
-at the software version level that checks the head coil that was used
+On the other hand, perhaps you have decided that using anything other than a
+32-channel head coil is an error. In that case, you may choose to specify a 
+configuration file at the software version level that checks the head coil
 
 ```console
 ./configs
@@ -97,6 +98,25 @@ at the software version level that checks the head coil that was used
     └── prisma
         └── ve11b
             └── mrverify.yaml
+```
+
+## device serial number
+There are sometimes situations where you have a single scanner that is behaving
+differently from other scanners with the same properties. In those situations,
+you may need a configuration file that is specific to that scanner. To
+accommodate this, you may include a subdirectory at the root level of your
+confifuation file directory tree that targets the serial number of that scanner.
+Within that subdirectory, you may create a configuration file using any of the
+subdirectories described above
+
+```console
+./configs
+└── 123456
+    └── siemens
+        └── prisma
+            └── xa60
+                └── head_32
+                    └── mrverify.yaml
 ```
 
 You can find example configuration files [here](https://github.com/harvard-nrg/mrverify/tree/main/example_configs).

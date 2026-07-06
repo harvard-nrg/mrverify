@@ -15,7 +15,17 @@ with warnings.catch_warnings():
 
 logger = logging.getLogger(__name__)
 
-Scanner = namedtuple('Scanner', ['manufacturer', 'model', 'software', 'coil', 'dicom_format'])
+Scanner = namedtuple(
+    'Scanner',
+    [
+        'manufacturer',
+        'model',
+        'software',
+        'coil',
+        'serial_number',
+        'dicom_format'
+    ]
+)
 
 def get_scanner_details(auth, experiment):
     for scan in scans(auth, experiment):
@@ -24,6 +34,7 @@ def get_scanner_details(auth, experiment):
             squash(scan.manufacturer_model_name),
             squash(scan.software_versions),
             squash(scan.coil),
+            squash(scan.device_serial_number),
             scan.dicom_format
         )
 
@@ -36,7 +47,6 @@ def match(filter, scans):
         match = True
         for key,expected in iter(filter.items()):
             actual = scan.get(key, '')
-            #logger.info(f'{scan.series_number} comparing actual={actual} equals expected={expected}')
             equality = actual == expected
             match = match and equality
         if match:
@@ -55,7 +65,10 @@ def fetch_dicom_file(auth, scan):
     subject = scan['subject_label']
     session = scan['session_label']
     scanid = scan['id']
-    url = f'{baseurl}/data/projects/{project}/subjects/{subject}/experiments/{session}/scans/{scanid}/files'
+    url = (
+        f'{baseurl}/data/projects/{project}/subjects/{subject}'
+        f'/experiments/{session}/scans/{scanid}/files'
+    )
     r = requests.get(
         url,
         auth=yaxil.basicauth(auth),

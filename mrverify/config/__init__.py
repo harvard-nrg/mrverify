@@ -22,8 +22,12 @@ class Config:
             scanner.software,
             scanner.coil
         )
-        levels = len(subdirs.parts)
+        # allow device serial number at the top of the tree
+        path = Path(confd, scanner.serial_number)
+        if path.exists():
+            subdirs = Path(scanner.serial_number, subdirs)
         path = Path(confd, subdirs)
+        levels = len(subdirs.parts)
         for level in range(levels):
             conf = Path(
                 path,

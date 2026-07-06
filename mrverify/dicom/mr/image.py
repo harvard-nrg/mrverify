@@ -37,7 +37,11 @@ class MRImageStorage:
     @property
     def bandwidth(self):
         return float(self._ds.PixelBandwidth)
-   
+
+    @property
+    def device_serial_number(self):
+        return self._ds.DeviceSerialNumber
+
     @property
     def pe_direction(self):
         tag = Tag(0x0018, 0x1312) 
