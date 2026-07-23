@@ -1,6 +1,9 @@
+import logging
 from .image import MRImageStorage
 from .enhanced import EnhancedMRImageStorage
 from .. import get_dicom_format
+
+logger = logging.getLogger(__name__)
 
 class ImageCreator:
     def __init__(self, ds):
@@ -16,5 +19,9 @@ class ImageCreator:
             case 'Enhanced SR Storage':
                 return EnhancedMRImageStorage(self._ds) 
             case _:
-                raise Exception(f'unhandled dicom format {self._dicom_format}, {self._dicom_format.name}')
+                logger.warning(
+                    f'unhandled dicom format {self._dicom_format}, '
+                    f'{self._dicom_format.name}, treating as MRImageStorage'
+                )
+                return MRImageStorage(self._ds)
 
