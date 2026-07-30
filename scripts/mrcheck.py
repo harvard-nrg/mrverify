@@ -101,8 +101,14 @@ def main():
         notifier = NotifierCreator.create(conf)
         notifier.add_meta(meta)
         notifier.add_report(saveas)
-        recipients_pass = conf.query('$.Notifications.recipients.pass', default=None)
-        recipients_fail = conf.query('$.Notifications.recipients.fail', default=None)
+        recipients_pass = conf.query(
+            '$.Notifications.recipients.pass',
+            default=None
+        )
+        recipients_fail = conf.query(
+            '$.Notifications.recipients.fail',
+            default=None
+        )
         if recipients_fail and report.has_errors:
             logger.info('report has errors')
             notifier.send(recipients_fail, error=True)

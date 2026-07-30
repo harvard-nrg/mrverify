@@ -2,6 +2,7 @@ import os
 import string
 import base64
 import logging
+import httplib2
 from pathlib import Path
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -54,7 +55,10 @@ class Notifier:
         logger.debug(token_file)
         creds = None
         if token_file.exists():
-            creds = Credentials.from_authorized_user_file(token_file, self._scopes)
+            creds = Credentials.from_authorized_user_file(
+                token_file,
+                self._scopes
+            )
 
         # If there are no (valid) credentials available, let the user log in.
         if not creds or not creds.valid:
@@ -69,7 +73,11 @@ class Notifier:
                 token.write(creds.to_json())
 
         try:
-            service = build('gmail', 'v1', credentials=creds)
+            service = build(
+                'gmail',
+                'v1',
+                credentials=creds
+            )
             message = MIMEMultipart()
 
             # add message content
@@ -107,8 +115,11 @@ class Notifier:
             create_message = {
                 'raw': encoded_message
             }
-            send_message = (service.users().messages().send
-                            (userId="me", body=create_message).execute())
+            send_message = (
+                service.users().messages().send(
+                    userId="me", body=create_message
+                ).execute()
+            )
             logger.info(f'Gmail API Message Id: {send_message["id"]}')
         except HttpError as error:
             logger.error(f'Gmail API error occurred: {error}')

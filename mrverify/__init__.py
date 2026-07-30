@@ -29,6 +29,9 @@ Scanner = namedtuple(
 
 def get_scanner_details(auth, experiment):
     for scan in scans(auth, experiment):
+        dicom_format = scan.dicom_format.name.lower()
+        if 'mr image storage' not in dicom_format:
+            continue
         return Scanner(
             squash(scan.manufacturer),
             squash(scan.manufacturer_model_name),
@@ -69,8 +72,12 @@ def fetch_dicom_file(auth, scan):
         f'{baseurl}/data/projects/{project}/subjects/{subject}'
         f'/experiments/{session}/scans/{scanid}/files'
     )
+    logger.debug(f'fetching a dicom file from scan {scanid}')
     r = requests.get(
         url,
+        params={
+            'file_format': 'DICOM'
+        },
         auth=yaxil.basicauth(auth),
         cookies=auth.cookie
     )

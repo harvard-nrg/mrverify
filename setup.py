@@ -12,7 +12,8 @@ requires = [
     'requests-cache',
     'jsonpath-ng',
     'google-api-python-client',
-    'google-auth-oauthlib'
+    'google-auth-oauthlib',
+    'pysocks'
 ]
 
 test_requirements = [
