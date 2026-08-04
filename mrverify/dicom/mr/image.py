@@ -1,5 +1,6 @@
 import re
 import sys
+import math
 import json
 import logging
 import warnings
@@ -25,8 +26,42 @@ class MRImageStorage:
     def orientation_string(self):
         tag = Tag(0x0051, 0x100e)
         if tag not in self._ds:
-            raise MissingTagError(tag)
+            arr = self.image_orientation_patient
+            return self._siemens_orientation_string(arr)
         return self._ds[tag].value
+
+    @property
+    def image_orientation_patient(self):
+        return self._ds.ImageOrientationPatient
+
+    def _siemens_orientation_string(self, arr):
+        r = arr[0:3]
+        c = arr[3:6]
+        n = (
+            r[1]*c[2] - r[2]*c[1],
+            r[2]*c[0] - r[0]*c[2],
+            r[0]*c[1] - r[1]*c[0],
+        )
+        labels = ["Sag", "Cor", "Tra"]
+        primary_idx = max(range(3), key=lambda i: abs(n[i]))
+
+        if n[primary_idx] < 0:
+            n = tuple(-x for x in n)
+
+        secondary_idx = [i for i in range(3) if i != primary_idx]
+        angles = {
+            i: -math.degrees(math.atan2(n[i], n[primary_idx]))
+            for i in secondary_idx
+        }
+
+        rounded = {i: round(angles[i], 1) for i in secondary_idx}
+        nonzero = [i for i in secondary_idx if rounded[i] != 0]
+        ordered = sorted(nonzero, key=lambda i: -abs(angles[i]))
+
+        parts = [labels[primary_idx]]
+        for i in ordered:
+            parts.append(f"{labels[i]}({rounded[i]:.1f})")
+        return ">".join(parts)
 
     @property
     def prescan_norm(self):

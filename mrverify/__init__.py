@@ -57,7 +57,11 @@ def match(filter, scans):
 
 def scans(auth, experiment):
     for scan in yaxil.scans(auth, experiment=experiment):
-        ds,count = fetch_dicom_file(auth, scan)
+        try:
+            ds,count = fetch_dicom_file(auth, scan)
+        except NoDicomsError as e:
+            logger.warning(e)
+            continue
         image = ImageCreator(ds).create()
         image.num_files = count
         yield image
@@ -70,14 +74,11 @@ def fetch_dicom_file(auth, scan):
     scanid = scan['id']
     url = (
         f'{baseurl}/data/projects/{project}/subjects/{subject}'
-        f'/experiments/{session}/scans/{scanid}/files'
+        f'/experiments/{session}/scans/{scanid}/resources/DICOM/files'
     )
     logger.debug(f'fetching a dicom file from scan {scanid}')
     r = requests.get(
         url,
-        params={
-            'file_format': 'DICOM'
-        },
         auth=yaxil.basicauth(auth),
         cookies=auth.cookie
     )
@@ -85,6 +86,8 @@ def fetch_dicom_file(auth, scan):
         raise ResponseError(f'response not ok ({r.status_code}) from {r.url}')
     js = r.json()
     files = js['ResultSet']['Result']
+    if not files:
+        raise NoDicomsError(f'no dicom resources found under {url}')
     path = files[0]['URI'].lstrip('/')
     r = requests.get(
         f'{baseurl}/{path}',
@@ -95,6 +98,9 @@ def fetch_dicom_file(auth, scan):
         raise ResponseError(f'response not ok ({r.status_code}) from {r.url}')
     ds = pydicom.dcmread(BytesIO(r.content))
     return ds,len(files)
+
+class NoDicomsError(Exception):
+    pass
 
 class ResponseError(Exception):
     pass

@@ -80,8 +80,10 @@ class EnhancedMRImageStorage(MRImageStorage):
         return round(item.EffectiveEchoTime, 3)
 
     @property
-    def orientation_string(self):
-        raise MissingTagError()
+    def image_orientation_patient(self):
+        item = self._ds.PerFrameFunctionalGroupsSequence[0]
+        item = item.PlaneOrientationSequence[0]
+        return item.ImageOrientationPatient
 
     @property
     def pixel_spacing(self):
