@@ -26,9 +26,13 @@ class MRImageStorage:
     def orientation_string(self):
         tag = Tag(0x0051, 0x100e)
         if tag not in self._ds:
-            arr = self.image_orientation_patient
-            return self._siemens_orientation_string(arr)
+            raise MissingTagError(tag)
         return self._ds[tag].value
+
+    @property
+    def derived_orientation_string(self):
+        arr = self.image_orientation_patient
+        return self._siemens_orientation_string(arr)
 
     @property
     def image_orientation_patient(self):
