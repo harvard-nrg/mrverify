@@ -94,9 +94,9 @@ a sub-directory under the software version, like so
 ```
 
 On the other hand, perhaps you've decided that using anything other than a
-32-channel head coil is a protocol violation. In that case, you may choose to 
-specify a configuration file at the software version level that checks the head 
-coil
+32-channel head coil is a protocol violation and should result in a failed parameter
+check. In that case, you may choose to specify a configuration file at the software 
+version level that will fail if the head coil is not `head_32`
 
 ```console
 ./configs
@@ -107,14 +107,18 @@ coil
 ```
 
 ## device serial number
-It is not uncommon to face a situation where you have a single scanner that is 
-behaving differently from other scanners with nearly identical properties. In 
-those situations, you may need a configuration file that targets that specific 
-scanner. To do this, you can include a subdirectory at the root level of your
-configuation file directory tree that targets the serial number of that scanner.
-Within that subdirectory, you may (or may not) create any of the subdirectories 
-described above. Maybe this scanner is upgraded to a new software version next 
-month. You never know what could happen, but MR Verify has got your back
+Just when you thought you had all your bases covered, you will be humbled, again, by 
+the harshness of reality. It's actually not unheard of to encounter a situation where 
+you have a single scanner that is somehow behaving differently from all other scanners 
+in your study that have nearly identical properties. As a result, a special variation 
+of the study protocol had to be deployed to that scanner, which in turn needs slightly 
+different parameter checks. In those situations, you may need a configuration file that 
+targets that specific scanner. To do this, you can include a subdirectory at the root 
+level of your configuration file directory tree that targets the serial number of that 
+scanner. Within that subdirectory, you may (or may not) create any of the subdirectories 
+described above. Maybe this scanner will be upgraded to a new software version next 
+month? You never know what could happen, but rest assured that MR Verify has got your 
+back
 
 ```console
 ./configs
