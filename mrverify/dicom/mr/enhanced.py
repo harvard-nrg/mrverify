@@ -12,6 +12,17 @@ class EnhancedMRImageStorage(MRImageStorage):
         super().__init__(ds)
 
     @property
+    def pe_direction_positive(self):
+        try:
+            item = self._ds.PerFrameFunctionalGroupsSequence[0]
+            sub = item[(0x0021, 0x11fe)].value[0]
+            return int(sub[(0x0021, 0x111c)].value)
+        except Exception as e:
+            logger.exception(e)
+        
+        return math.inf
+
+    @property
     def prescan_norm(self):
         if 'NORM' in self.secondary_image_type:
             return True

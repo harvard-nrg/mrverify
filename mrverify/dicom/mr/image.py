@@ -124,6 +124,11 @@ class MRImageStorage:
     @property
     def num_volumes(self):
         return self.num_files
+    
+    @property
+    def pe_direction_positive(self):
+        csa = self._csa_header_info('image')
+        return csareader.get_scalar(csa, 'PhaseEncodingDirectionPositive')
 
     @property
     def num_slices(self):
