@@ -5,6 +5,7 @@ import json
 import logging
 import warnings
 from pydicom.tag import Tag
+from pydicom.valuerep import DA
 from mrverify.dicom import MissingTagError
 with warnings.catch_warnings():
     warnings.simplefilter('ignore')
@@ -28,6 +29,10 @@ class MRImageStorage:
         if tag not in self._ds:
             raise MissingTagError(tag)
         return self._ds[tag].value
+
+    @property
+    def study_date(self):
+        return DA(ds.StudyDate)
 
     @property
     def derived_orientation_string(self):
@@ -210,6 +215,8 @@ class MRImageStorage:
             pass
 
         return ['MISSING']
+
+    image_type_text = secondary_image_type
 
     @property
     def software_version(self):

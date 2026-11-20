@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import json
@@ -8,11 +8,13 @@ import mrverify
 import requests_cache
 import argparse as ap
 from pathlib import Path
+from datetime import date
 from urllib.parse import urlparse
 from mrverify.config import Config
 from mrverify.report import Report
 from mrverify.validator import Validator
 from mrverify.notifications import NotifierCreator
+from mrverify.date.parse import date_pattern, find_dates
 
 logger = logging.getLogger('mrcheck')
 
@@ -27,6 +29,7 @@ def main():
     parser.add_argument('--xnat-host')
     parser.add_argument('--xnat-user')
     parser.add_argument('--xnat-pass')
+    parser.add_argument('--check-date', metavar='PATTERN', type=date_pattern)
     parser.add_argument('--cache', action='store_true')
     parser.add_argument('-v', '--verbose', action='store_true')
     args = parser.parse_args()
@@ -54,7 +57,19 @@ def main():
             project=args.project
         )
     )
-    logger.info('querying for scans from xnat')
+
+    # validate date in --label against real study date
+    if args.check_date:
+        expected = date.fromisoformat(experiment.study_date)
+        found = find_dates(args.label, args.check_date)
+        if not found:
+            report.misc('session_label_date', expected, None)
+        elif len(found) > 1:
+            report.misc('sessiion_label_date', expected, f'PARSED {len(found)} DATES')
+        else:
+            actual = found.pop()
+            if actual != expected:
+                report.misc('session_label_date', expected, actual)
 
     logger.info('getting scanner details')
     scanner = mrverify.get_scanner_details(auth, experiment)

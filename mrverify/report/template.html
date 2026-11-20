@@ -36,6 +36,35 @@
       </nav>
     </div>
     <table class="table table-striped table-hover">
+      {%if miscerrs %}
+        <thead class="thead-dark">
+          <tr>
+            <th colspan="4">MISCELLANEOUS ERRORS</th>
+          </tr>
+        </thead>
+        <tr class="table-secondary">
+          <td>
+            <b>Parameter</b>
+          </td>
+          <td>
+            <b>Expected</b>
+          </td>
+          <td>
+            <b>Actual</b>
+          </td>
+          <td>
+            <b>Result</b>
+          </td>
+        </tr>
+        {% for label,expected,actual in miscerrs %}
+          <tr class="table-danger">
+            <td>{{ label }}</td>
+            <td>{{ expected }}</td>
+            <td>{{ actual }}</td>
+            <td>Err</td>
+          </tr>
+        {% endfor %}
+      {% endif %}
       {% for filter in missing %}
         <thead class="thead-dark">
           <tr>

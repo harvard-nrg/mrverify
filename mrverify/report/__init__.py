@@ -17,10 +17,15 @@ class Report:
         self.data = dict()
         self.meta = dict()
         self.missing = list()
+        self.miscerrs = list()
         self.has_errors = False
         template = Path(__dir__, 'template.html')
         with open(template) as fo:
             self.template = Template(fo.read())
+
+    def misc(self, label, expected, actual):
+        self.miscerrs.append((label, expected, actual))
+        self.has_errors = True
 
     def missed(self, filter):
         self.missing.append(filter)
@@ -43,6 +48,7 @@ class Report:
             fo.write(self.template.render(
                 data=self.data,
                 missing=self.missing,
+                miscerrs=self.miscerrs,
                 meta=self.meta,
                 errors=self.has_errors
             ))
