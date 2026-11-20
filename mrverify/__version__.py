@@ -1,6 +1,6 @@
 __title__ = 'mrverify'
 __description__ = 'MRI scan parameter verification'
 __url__ = 'https://github.com/harvard-nrg/mrverify'
-__version__ = '0.8.3'
+__version__ = '0.8.4'
 __author__ = 'Neuroinformatics Research Group'
 __author_email__ = 'info@neuroinfo.org'
